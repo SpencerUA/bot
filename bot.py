@@ -1,160 +1,47 @@
+import random
 import telebot
-from telebot import types
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# Токен вашего бота, полученный от BotFather
-TOKEN = 'YOUR_BOT_TOKEN'
+# Замените <YOUR_BOT_TOKEN> на фактический токен вашего бота
+bot = telebot.TeleBot("6128190847:AAF5ypTpAEIJ20q_CsMfjwjyLMz8NXV6nkI")
 
-# Создание экземпляра бота
-bot = telebot.TeleBot(6128190847:AAF5ypTpAEIJ20q_CsMfjwjyLMz8NXV6nkI)
+# Список ссылок на тесты для каждой группы респондентов
+links_group1 = ["https://example.com/test1"]
+links_group2 = ["https://example.com/test3"]
 
-# Обработчик команды /start
 @bot.message_handler(commands=['start'])
 def handle_start(message):
-    # Создаем клавиатуру с кнопкой
-    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    button = types.KeyboardButton(text="Получить ссылку на тест")
-    keyboard.add(button)
+    # Создаем клавиатуру с кнопкой "Пройти тест"
+    keyboard = InlineKeyboardMarkup()
+    keyboard.add(InlineKeyboardButton("Пройти тест", callback_data='start_test'))
+    
+    # Отправляем приветственное сообщение с кнопкой
+    bot.reply_to(message, "Привет! Хочешь пройти тест?", reply_markup=keyboard)
 
-    # Отправляем приветственное сообщение с клавиатурой
-    bot.send_message(message.chat.id, "Привет! Хочешь пройти тест?", reply_markup=keyboard)
-
-# Обработчик нажатия кнопки "Получить ссылку на тест"
-@bot.message_handler(func=lambda message: message.text == "Получить ссылку на тест")
-def handle_test_link(message):
-    # Определяем группу пользователя
-    group = determine_user_group(message.from_user.id)
-
-    # Отправляем ссылку на тест в зависимости от группы
-    if group == 1:
-        bot.send_message(message.chat.id, "Вот ссылка на тест для группы 1: <ссылка_для_группы_1>")
-    elif group == 2:
-        bot.send_message(message.chat.id, "Вот ссылка на тест для группы 2: <ссылка_для_группы_2>")
-
-# Обработчик нажатия кнопки "Я прошел тест"
-@bot.message_handler(func=lambda message: message.text == "Я прошел тест")
-def handle_test_completed(message):
-# Запрос ID пользователя
-bot.send_message(message.chat.id, "Пожалуйста, введите ваш ID, указанный на сайте:")
-
-# Обработчик ввода ID пользователя
-@bot.message_handler(func=lambda message: True) # Любое сообщение будет обрабатываться
-def handle_user_id(message):
-# Получаем ID пользователя и производим начисление награды
-user_id = message.text
-reward = calculate_reward(user_id)
-# Отправляем сообщение с информацией о начисленной награде
-bot.send_message(message.chat.id, f"Вам начислена награда: {reward}.")
-Функция для определения группы пользователя (здесь просто пример, вы можете заменить ее на вашу логику)
-def determine_user_group(user_id):
-# Здесь вы можете реализовать логику определения группы пользователя
-# Возвращаем 1 или 2 в зависимости от группы пользователя
-return 1 if user_id % 2 == 0 else 2
-
-# Функция для расчета награды пользователя (здесь просто пример, вы можете заменить ее на вашу логику)
-def calculate_reward(user_id):
-# Здесь вы можете реализовать логику расчета награды для пользователя
-# Возвращаем сумму награды в зависимости от ID пользователя
-return user_id * 10
-
-# Запуск бота
-bot.polling()
-import telebot
-from telebot import types
-
-# Токен вашего бота, полученный от BotFather
-TOKEN = 'YOUR_BOT_TOKEN'
-
-# Создание экземпляра бота
-bot = telebot.TeleBot(TOKEN)
-
-# Словарь для хранения данных о пользователях
-users_data = {}
-
-# Обработчик команды /start
-@bot.message_handler(commands=['start'])
-def handle_start(message):
-    # Создаем клавиатуру с кнопкой
-    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
-    button = types.KeyboardButton(text="Получить ссылку на тест")
-    keyboard.add(button)
-
-    # Отправляем приветственное сообщение с клавиатурой
-    bot.send_message(message.chat.id, "Привет! Хочешь пройти тест?", reply_markup=keyboard)
-
-# Обработчик нажатия кнопки "Получить ссылку на тест"
-@bot.message_handler(func=lambda message: message.text == "Получить ссылку на тест")
-def handle_test_link(message):
-    # Определяем группу пользователя
-    group = determine_user_group(message.from_user.id)
-
-    # Отправляем ссылку на тест в зависимости от группы
-    if group == 1:
-        test_link = "ссылка_для_группы_1"
-    elif group == 2:
-        test_link = "ссылка_для_группы_2"
-
-    # Сохраняем данные о пользователе
-    users_data[message.from_user.id] = {
-        "group": group,
-        "test_link": test_link,
-        "completed_test": False
-    }
-
-    # Отправляем ссылку на тест
-    bot.send_message(message.chat.id, f"Вот ссылка на тест: {test_link}")
-
-# Обработчик нажатия кнопки "Я прошел тест"
-@bot.message_handler(func=lambda message: message.text == "Я прошел тест")
-def handle_test_completed(message):
-    user_id = message.from_user.id
-
-    # Проверяем, что пользователь прошел тест
-    if user_id in users_data and not users_data[user_id]["completed_test"]:
-        # Обновляем статус прохождения теста
-        users_data[user_id]["completed_test"] = True
-
-        # Запрос ID пользователя
-        bot.send_message(message.chat.id, "Пожалуйста, введите ваш ID, указанный на сайте:")
+@bot.callback_query_handler(func=lambda call: call.data == 'start_test')
+def handle_start_test(callback_query):
+    # Определяем группу, к которой принадлежит респондент
+    user_id = callback_query.from_user.id
+    group_number = user_id % 2  # Простое распределение по остатку от деления
+    
+    # Получаем случайную ссылку на тест из соответствующей группы
+    if group_number == 0:
+        test_link = random.choice(links_group1)
     else:
-        # Если пользователь уже прошел тест, отправляем сообщение об ошибке
-        bot.send_message(message.chat.id, "Вы уже прошли тест!")
+        test_link = random.choice(links_group2)
+    
+    # Отправляем респонденту ссылку на тест
+    bot.send_message(user_id, f"Вот ссылка для прохождения теста: {test_link}")
+    bot.send_message(user_id, "Пожалуйста, пройдите тест по ссылке.")
+    
+@bot.callback_query_handler(func=lambda call: call.data == 'test_completed')
+def handle_test_completed(callback_query):
+    user_id = callback_query.from_user.id
+    bot.send_message(user_id, "Спасибо, что прошли тест! Ваш результат был успешно записан.")
+    
+    # Отправляем уведомление администратору
+    admin_id = <ADMIN_USER_ID>  # Замените <ADMIN_USER_ID> на фактический ID администратора
+    bot.send_message(admin_id, f"Респондент с ID {user_id} успешно прошел тест.")
 
-# Обработчик ввода ID пользователя
-@bot.message_handler(func=lambda message: True)  # Любое сообщение будет обрабатываться
-def handle_user_id(message):
-    user_id = message.from_user.id
-
-    # Проверяем, что пользователь прошел тест и в
-@bot.message_handler(func=lambda message: True) # Любое сообщение будет обрабатываться
-def handle_user_id(message):
-user_id = message.from_user.id
-# Проверяем, что пользователь прошел тест и ввел свой ID
-if user_id in users_data and users_data[user_id]["completed_test"]:
-    # Получаем введенный пользователем ID
-    entered_id = message.text
-
-    # Выполняем начисление награды
-    reward = calculate_reward(entered_id)
-
-    # Удаляем данные о пользователе
-    del users_data[user_id]
-
-    # Отправляем сообщение с информацией о начисленной награде
-    bot.send_message(message.chat.id, f"Вам начислена награда: {reward}.")
-else:
-    # Если пользователь не прошел тест или не ввел ID, отправляем сообщение об ошибке
-    bot.send_message(message.chat.id, "Вы не прошли тест или не ввели свой ID.")
-Функция для определения группы пользователя (здесь просто пример, вы можете заменить ее на вашу логику)
-def determine_user_group(user_id):
-# Здесь вы можете реализовать логику определения группы пользователя
-# Возвращаем 1 или 2 в зависимости от группы пользователя
-return 1 if user_id % 2 == 0 else 2
-
-Функция для расчета награды пользователя (здесь просто пример, вы можете заменить ее на вашу логику)
-def calculate_reward(user_id):
-# Здесь вы можете реализовать логику расчета награды для пользователя
-# Возвращаем сумму награды в зависимости от ID пользователя
-return user_id * 10
-
-Запуск бота
+# Запускаем бота
 bot.polling()
